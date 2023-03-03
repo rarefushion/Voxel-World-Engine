@@ -13,29 +13,46 @@ namespace Voxel_World_Engine
     internal class TestWindow : GameWindow
     {
         private int vertexBufferHandle;
+        private int indexBufferHandle;
         private int shaderProgramHandle;
         private int vertexArrayHandle;
 
         public TestWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
-            this.CenterWindow(new Vector2i(1920, 1080));
+            this.CenterWindow(new Vector2i(1280, 720));
         }
 
         protected override void OnLoad()
         {
             GL.ClearColor(new Color4(0f, 0f, 0f, 1f));
 
+            float x = 384f;
+            float y = 400f;
+            float w = 512f;
+            float h = 256f;
+
             float[] vertices = new float[]
             {
-                0f, 0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                -0.5f, -0.5f, 0f
+                x, y + h, 0f,       //TL
+                x + w, y + h, 0f,   //TR
+                x, y, 0f,           //BL
+                x + w, y, 0f        //BR
+            };
+
+            int[] indecies = new int[]
+            {
+                0, 1, 3, 0, 3, 2
             };
 
             vertexBufferHandle = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferHandle);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+            indexBufferHandle = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferHandle);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indecies.Length * sizeof(float), indecies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             vertexArrayHandle = GL.GenVertexArray();
             GL.BindVertexArray(vertexArrayHandle);
@@ -50,11 +67,15 @@ namespace Voxel_World_Engine
                 @"
                 #version 330 core
 
+                uniform vec2 ViewportSize
+
                 layout (location = 0) in vec3 aPosition;
 
                 void main()
                 {
-                    gl_Position = vec4(aPosition, 1f);
+                    float nx = aPosition.x / ViewportSize.x * 2f - 1f;
+                    float ny = aPosition.y / ViewportSize.y * 2f - 1f;
+                    gl_Position = vec4(nx, ny , 0f, 1f);
                 }
                 ";
 
@@ -74,9 +95,21 @@ namespace Voxel_World_Engine
             GL.ShaderSource(vertexShaderHandle, vertexShaderCode);
             GL.CompileShader(vertexShaderHandle);
 
+            string vertexShaderInfo = GL.GetShaderInfoLog(vertexArrayHandle);
+            if (vertexShaderInfo != String.Empty)
+            {
+
+            }
+
             int fragmentShaderHandle = GL.CreateShader(ShaderType.FragmentShader);
             GL.ShaderSource(fragmentShaderHandle, fragmentShaderCode);
             GL.CompileShader(fragmentShaderHandle);
+
+            string fragmentShaderInfo = GL.GetShaderInfoLog(fragmentShaderHandle);
+            if (fragmentShaderInfo != String.Empty)
+            {
+
+            }
 
             shaderProgramHandle = GL.CreateProgram();
 
@@ -90,6 +123,13 @@ namespace Voxel_World_Engine
 
             GL.DeleteShader(vertexShaderHandle);
             GL.DeleteShader(fragmentShaderHandle);
+
+            int[] viewport = new int[4];
+            GL.GetInteger(GetPName.Viewport, viewport);
+            GL.UseProgram(shaderProgramHandle);
+            int viewportSizeUniformLocation = GL.GetUniformLocation(shaderProgramHandle, "ViewportSize");
+            GL.Uniform2(viewportSizeUniformLocation, (float)viewport[2], (float)viewport[3]);
+            GL.UseProgram(0);
 
             base.OnLoad();
         }
@@ -111,7 +151,8 @@ namespace Voxel_World_Engine
 
             GL.UseProgram(shaderProgramHandle);
             GL.BindVertexArray(vertexArrayHandle);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferHandle);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 
             this.Context.SwapBuffers();
             base.OnRenderFrame(args);
@@ -121,6 +162,9 @@ namespace Voxel_World_Engine
         {
             GL.BindVertexArray(0);
             GL.DeleteVertexArray(vertexArrayHandle);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            GL.DeleteBuffer(indexBufferHandle);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.DeleteBuffer(vertexBufferHandle);
