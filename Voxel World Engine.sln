@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Voxel World Engine", "Voxel World Engine\Voxel World Engine.csproj", "{C91FF4DA-CE1C-4D0D-B53B-AC9C22F32EC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C91FF4DA-CE1C-4D0D-B53B-AC9C22F32EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C91FF4DA-CE1C-4D0D-B53B-AC9C22F32EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C91FF4DA-CE1C-4D0D-B53B-AC9C22F32EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C91FF4DA-CE1C-4D0D-B53B-AC9C22F32EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9922CBCE-52EB-430A-BC7C-3BB789119A50}
+	EndGlobalSection
+EndGlobal
